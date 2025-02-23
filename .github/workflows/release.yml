@@ -52,10 +52,14 @@ jobs:
 
       - name: Build
         run: |
-          GOOS=${{ matrix.os }} GOARCH=amd64 go build -o robotgo-server-${{ matrix.os }}-${{ matrix.go-version }} .
+          GOOS=${{ matrix.os }} GOARCH=amd64 go build -o dist/robotgo-server-${{ matrix.os }}-amd64 .
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+      - name: Release
+        uses: ncipollo/release-action@v1
         with:
-          name: robotgo-server
-          path: robotgo-server-${{ matrix.os }}-${{ matrix.go-version }}
+          draft: true
+          allowUpdates: true
+          makeLatest: false
+          tag: ${{ steps.get-tag.outputs.tag }}
+          artifacts: 'dist/*'
+          token: ${{ secrets.GITHUB_TOKEN }}
