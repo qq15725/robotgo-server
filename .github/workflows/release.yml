@@ -73,14 +73,19 @@ jobs:
           
           Write-Host "Extracting MinGW-w64 source code ..."
           tar -xjf $mingwSourcePath -C $env:TEMP
+
+          if (-Not (Test-Path $mingwSourceDir)) {
+            Write-Host "Failed to extract MinGW-w64 source code."
+            exit 1
+          }
           
           $msys2Path = "C:\msys64"
-          
+
           if (-Not (Test-Path $msys2Path)) {
             Write-Host "MSYS2 is not installed. Please install MSYS2 from https://www.msys2.org/ before proceeding."
             exit 1
           }
-        
+          
           $mingwBinPath = "C:\msys64\mingw64\bin"
           $currentPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
           if (-Not ($currentPath -contains $mingwBinPath)) {
@@ -90,18 +95,10 @@ jobs:
           } else {
             Write-Host "MinGW-w64 bin directory is already in system PATH."
           }
-        
-          Set-Location -Path $mingwSourceDir
           
-          Write-Host "Configuring MinGW-w64 build ..."
-          ./configure --prefix=/mingw64 --enable-shared --enable-static
-          
-          Write-Host "Compiling MinGW-w64 ..."
-          make
-          
-          Write-Host "Installing MinGW-w64 ..."
-          make install
-          
+          Write-Host "Running MSYS2 environment to configure and build MinGW-w64 ..."
+          & "C:\msys64\usr\bin\bash.exe" -c "cd $mingwSourceDir && ./configure --prefix=/mingw64 --enable-shared --enable-static && make && make install"
+            
           Write-Host "Verifying MinGW-w64 installation ..."
           $gccVersion = & "C:\msys64\mingw64\bin\gcc.exe" --version
           if ($gccVersion) {
