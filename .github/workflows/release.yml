@@ -64,9 +64,7 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             platforms=(
-              "linux/386"
               "linux/amd64"
-              "linux/arm"
               "linux/arm64"
             )
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -76,9 +74,7 @@ jobs:
             )
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             platforms=(
-              "windows/386"
               "windows/amd64"
-              "windows/arm"
               "windows/arm64"
             )
           fi
