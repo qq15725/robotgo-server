@@ -87,7 +87,7 @@ jobs:
           for platform in "${platforms[@]}"; do
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
-            if [[ platform == "linux/arm64" ]]; then
+            if [[ "$platform" == "linux/arm64" ]]; then
               CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
             else
               GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
