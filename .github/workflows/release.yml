@@ -56,6 +56,25 @@ jobs:
             sudo apt-get install -y libpng++-dev
             # GoHook
             sudo apt-get install -y xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev
+            # ARM64
+            if [[ "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
+              sudo apt-get install gcc-aarch64-linux-gnu
+              # For kylin
+              wget http://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz
+              tar -xvzf glibc-2.31.tar.gz
+              cd glibc-2.31
+              mkdir build
+              cd build
+              ../configure --prefix=/opt/glibc-2.31
+              make -j$(nproc)
+              sudo make install
+              export CC=aarch64-linux-gnu-gcc
+              export CXX=aarch64-linux-gnu-g++
+              export LD_LIBRARY_PATH=/opt/glibc-2.31/lib:$LD_LIBRARY_PATH
+              export LIBRARY_PATH=/opt/glibc-2.31/lib:$LIBRARY_PATH
+              export C_INCLUDE_PATH=/opt/glibc-2.31/include:$C_INCLUDE_PATH
+              export CPLUS_INCLUDE_PATH=/opt/glibc-2.31/include:$CPLUS_INCLUDE_PATH
+            fi
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install libpng libjpeg libx11
           fi
@@ -88,11 +107,7 @@ jobs:
           for platform in "${platforms[@]}"; do
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
-            if [[ "$platform" == "linux/arm64" ]]; then
-              GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -o dist/${prefix}_${os}_${arch}
-            else
-              GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
-            fi
+            GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
           done
 
       - name: Release
