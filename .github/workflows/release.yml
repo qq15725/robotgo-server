@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest, ubuntu-22.04-arm, macos-latest ]
         go-version: [ '1.23.3' ]
 
     steps:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" || "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
             sudo apt-get update
             # gcc
             sudo apt-get install -y gcc libc6-dev
@@ -57,7 +57,9 @@ jobs:
             # GoHook
             sudo apt-get install -y xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev
             # arm64
-            sudo apt-get install gcc-aarch64-linux-gnu
+            if [[ "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
+              sudo apt-get install gcc-aarch64-linux-gnu
+            fi
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install libpng libjpeg libx11
           fi
@@ -67,6 +69,9 @@ jobs:
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             platforms=(
               "linux/amd64"
+            )
+          elif [[ "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
+            platforms=(
               "linux/arm64"
             )
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
