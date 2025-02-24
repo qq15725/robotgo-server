@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, ubuntu-22.04-arm, macos-latest ]
+        os: [ ubuntu-latest, ubuntu-22.04-arm, macos-latest, windows-latest ]
         go-version: [ '1.23.3' ]
 
     steps:
@@ -43,6 +43,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Install dependencies
+        if: matrix.os != 'windows-latest'
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" || "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
             sudo apt-get update
@@ -61,6 +62,7 @@ jobs:
           fi
 
       - name: Build
+        if: matrix.os != 'windows-latest'
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             platforms=(
@@ -75,21 +77,33 @@ jobs:
               "darwin/amd64"
               "darwin/arm64"
             )
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            platforms=(
-              "windows/amd64"
-              "windows/arm64"
-            )
           fi
           
           repo_name="${{ github.event.repository.name }}"
           prefix="${repo_name//-/_}_${{ steps.get-tag.outputs.tag }}"
-      
+          
           for platform in "${platforms[@]}"; do
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
             GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
           done
+
+      - name: Build windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          $repo_name = "${{ github.event.repository.name }}"
+          $prefix = $repo_name -replace "-", "_"
+          $prefix = "${prefix}_${{ steps.get-tag.outputs.tag }}"
+          $platforms = @("windows/amd64", "windows/arm64")
+          
+          # Windows build (PowerShell syntax)
+          for ($i=0; $i -lt ${#platforms[@]}; $i++) {
+            $platform = $platforms[$i]
+            $os, $arch = $platform.Split('/')
+            $env:GOOS = $os
+            $env:GOARCH = $arch
+            go build -o dist/${prefix}_${os}_${arch}
+          }
 
       - name: Release
         uses: ncipollo/release-action@v1
