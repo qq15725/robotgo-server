@@ -27,6 +27,16 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
+      - name: Get release tag
+        id: get-tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
