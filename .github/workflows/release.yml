@@ -67,7 +67,7 @@ jobs:
           $mingwUrl = "https://sourceforge.net/projects/mingw-w64/files/latest/download"
           $mingwInstallerPath = "$env:TEMP\mingw-w64-installer.exe"
           Write-Host "Downloading MinGW-w64 installer from $mingwUrl ..."
-          Invoke-WebRequest -Uri $mingwUrl -OutFile $mingwInstallerPath
+          curl -L $mingwUrl -o $mingwInstallerPath -vvv
           $fileInfo = Get-Item $mingwInstallerPath
           $fileSize = $fileInfo.Length
           Write-Host "File size: $fileSize bytes"
