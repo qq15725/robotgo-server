@@ -90,7 +90,7 @@ jobs:
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
             GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
-            tar -czvf dist/${prefix}_${os}_${arch} -C dist/${prefix}_${os}_${arch}.tar.gz
+            tar -czvf dist/${prefix}_${os}_${arch}.tar.gz -C dist ${prefix}_${os}_${arch}
           done
 
       - name: Release
