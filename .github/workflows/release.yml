@@ -85,13 +85,13 @@ jobs:
           prefix="${repo_name//-/_}_${{ steps.get-tag.outputs.tag }}"
       
           for platform in "${platforms[@]}"; do
-            if [[ platform == "linux/arm64" ]]; then
-              export CC=aarch64-linux-gnu-gcc
-              export CXX=aarch64-linux-gnu-g++
-            fi
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
-            GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
+            if [[ platform == "linux/arm64" ]]; then
+              CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
+            else
+              GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
+            fi
           done
 
       - name: Release
