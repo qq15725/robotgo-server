@@ -68,6 +68,9 @@ jobs:
           $mingwInstallerPath = "$env:TEMP\mingw-w64-installer.exe"
           Write-Host "Downloading MinGW-w64 installer from $mingwUrl ..."
           Invoke-WebRequest -Uri $mingwUrl -OutFile $mingwInstallerPath
+          $fileInfo = Get-Item $mingwInstallerPath
+          $fileSize = $fileInfo.Length
+          Write-Host "File size: $fileSize bytes"
           Write-Host "Running MinGW-w64 installer ..."
           Start-Process -FilePath $mingwInstallerPath -ArgumentList "/SILENT" -Wait
           $mingwPath = "C:\mingw64"
