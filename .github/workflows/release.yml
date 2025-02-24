@@ -69,7 +69,7 @@ jobs:
           $mingwSourceDir = "$env:TEMP\mingw-w64-v11.0.0"
           
           Write-Host "Downloading MinGW-w64 source code from $mingwUrl ..."
-          Invoke-WebRequest -Uri $mingwUrl -OutFile $mingwSourcePath
+          curl -L $mingwUrl -o $mingwSourcePath -vvv
           
           Write-Host "Extracting MinGW-w64 source code ..."
           tar -xjf $mingwSourcePath -C $env:TEMP
