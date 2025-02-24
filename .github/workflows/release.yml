@@ -89,7 +89,7 @@ jobs:
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
             if [[ "$platform" == "linux/arm64" ]]; then
-              GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
+              GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -o dist/${prefix}_${os}_${arch}
             else
               GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
             fi
