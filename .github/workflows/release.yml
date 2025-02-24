@@ -68,6 +68,25 @@ jobs:
           version: 12.2.0
           platform: x64
 
+      - name: Set up GCC
+        if: matrix.os == 'windows-latest'
+        run: |
+          $currentPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+          if ($currentPath -notlike "*C:\mingw64\bin*") {
+            $newPath = "$currentPath;C:\mingw64\bin"
+            [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
+            Write-Host "已将 C:\mingw64\bin 添加到系统环境变量 Path 中。"
+          } else {
+            Write-Host "C:\mingw64\bin 已在系统环境变量 Path 中。"
+          }
+          $gccVersion = & "C:\mingw64\bin\gcc.exe" --version
+          if ($gccVersion) {
+            Write-Host "GCC 已成功安装："
+            Write-Host $gccVersion
+          } else {
+            Write-Host "GCC 未安装或未正确配置。"
+          }
+
       - name: Build
         if: matrix.os != 'windows-latest'
         run: |
