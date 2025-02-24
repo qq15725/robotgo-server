@@ -95,14 +95,12 @@ jobs:
           $prefix = $repo_name -replace "-", "_"
           $prefix = "${prefix}_${{ steps.get-tag.outputs.tag }}"
           $platforms = @("windows/amd64", "windows/arm64")
-          
-          # Windows build (PowerShell syntax)
-          for ($i=0; $i -lt ${#platforms[@]}; $i++) {
+          for ($i = 0; $i -lt $platforms.Length; $i++) {
             $platform = $platforms[$i]
             $os, $arch = $platform.Split('/')
             $env:GOOS = $os
             $env:GOARCH = $arch
-            go build -o dist/${prefix}_${os}_${arch}
+            go build -o "dist/${prefix}_${os}_${arch}"
           }
 
       - name: Release
