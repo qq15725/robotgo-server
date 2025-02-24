@@ -71,7 +71,6 @@ jobs:
             platforms=(
               "linux/amd64"
               "windows/amd64"
-              "windows/arm64"
             )
           elif [[ "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
             platforms=(
