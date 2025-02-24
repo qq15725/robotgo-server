@@ -62,18 +62,26 @@ jobs:
 
       - name: Build
         run: |
-          platforms=(
-          "linux/386"
-          "linux/amd64"
-          "linux/arm"
-          "linux/arm64"
-          "darwin/amd64"
-          "darwin/arm64"
-          "windows/386"
-          "windows/amd64"
-          "windows/arm"
-          "windows/arm64"
-          )
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            platforms=(
+              "linux/386"
+              "linux/amd64"
+              "linux/arm"
+              "linux/arm64"
+            )
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            platforms=(
+              "darwin/amd64"
+              "darwin/arm64"
+            )
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            platforms=(
+              "windows/386"
+              "windows/amd64"
+              "windows/arm"
+              "windows/arm64"
+            )
+          fi
           
           repo_name="${{ github.event.repository.name }}"
           prefix="${repo_name//-/_}_${{ steps.get-tag.outputs.tag }}"
