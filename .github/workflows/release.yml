@@ -75,7 +75,8 @@ jobs:
           "windows/arm64"
           )
           
-          prefix="${{ github.event.repository.name | replace('-', '_') }}_${{ steps.get-tag.outputs.tag }}"
+          repo_name="${{ github.event.repository.name }}"
+          prefix="${repo_name//-/_}_${{ steps.get-tag.outputs.tag }}"
       
           for platform in "${platforms[@]}"; do
             os=$(echo $platform | cut -d/ -f1)
