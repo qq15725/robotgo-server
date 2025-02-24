@@ -65,14 +65,14 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $mingwUrl = "https://sourceforge.net/projects/mingw-w64/files/latest/download"
-          $mingwSourcePath = "$env:TEMP\mingw-w64-v11.0.0.tar.bz2"
-          $mingwSourceDir = "$env:TEMP\mingw-w64-v11.0.0"
+          $mingwSourcePath = "mingw-w64-v11.0.0.tar.bz2"
+          $mingwSourceDir = "mingw-w64-v11.0.0"
           
           Write-Host "Downloading MinGW-w64 source code from $mingwUrl ..."
           curl -L $mingwUrl -o $mingwSourcePath -vvv
           
           Write-Host "Extracting MinGW-w64 source code ..."
-          tar -xjf $mingwSourcePath -C $env:TEMP
+          tar -xjf $mingwSourcePath -C .
 
           if (-Not (Test-Path $mingwSourceDir)) {
             Write-Host "Failed to extract MinGW-w64 source code."
