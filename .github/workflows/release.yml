@@ -60,53 +60,12 @@ jobs:
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install libpng libjpeg libx11
           fi
-
-      - name: Install windows dependencies
+          
+      - name: Set up MinGW
         if: matrix.os == 'windows-latest'
-        run: |
-          $mingwUrl = "https://sourceforge.net/projects/mingw-w64/files/latest/download"
-          $mingwSourcePath = "mingw-w64-v11.0.0.tar.bz2"
-          $mingwSourceDir = "mingw-w64-v11.0.0"
-          
-          Write-Host "Downloading MinGW-w64 source code from $mingwUrl ..."
-          curl -L $mingwUrl -o $mingwSourcePath -vvv
-          
-          Write-Host "Extracting MinGW-w64 source code ..."
-          tar -xjf $mingwSourcePath -C .
-
-          if (-Not (Test-Path $mingwSourceDir)) {
-            Write-Host "Failed to extract MinGW-w64 source code."
-            exit 1
-          }
-          
-          $msys2Path = "C:\msys64"
-
-          if (-Not (Test-Path $msys2Path)) {
-            Write-Host "MSYS2 is not installed. Please install MSYS2 from https://www.msys2.org/ before proceeding."
-            exit 1
-          }
-          
-          $mingwBinPath = "C:\msys64\mingw64\bin"
-          $currentPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-          if (-Not ($currentPath -contains $mingwBinPath)) {
-            $newPath = "$currentPath;$mingwBinPath"
-            [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
-            Write-Host "Added MinGW-w64 bin directory to system PATH."
-          } else {
-            Write-Host "MinGW-w64 bin directory is already in system PATH."
-          }
-          
-          Write-Host "Running MSYS2 environment to configure and build MinGW-w64 ..."
-          & "C:\msys64\usr\bin\bash.exe" -c "cd $mingwSourceDir && ./configure --prefix=/mingw64 --enable-shared --enable-static && make && make install"
-            
-          Write-Host "Verifying MinGW-w64 installation ..."
-          $gccVersion = & "C:\msys64\mingw64\bin\gcc.exe" --version
-          if ($gccVersion) {
-            Write-Host "GCC is installed and available:"
-            Write-Host $gccVersion
-          } else {
-            Write-Host "GCC is not available. Please check your installation."
-          }
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
 
       - name: Build
         if: matrix.os != 'windows-latest'
