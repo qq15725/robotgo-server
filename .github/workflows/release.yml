@@ -57,7 +57,7 @@ jobs:
             # GoHook
             sudo apt-get install -y xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev
             # arm64
-            sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            sudo apt-get install gcc-aarch64-linux-gnu
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install libpng libjpeg libx11
           fi
@@ -88,7 +88,7 @@ jobs:
             os=$(echo $platform | cut -d/ -f1)
             arch=$(echo $platform | cut -d/ -f2)
             if [[ "$platform" == "linux/arm64" ]]; then
-              CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
+              CC=aarch64-linux-gnu-gcc GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
             else
               GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/${prefix}_${os}_${arch}
             fi
