@@ -65,39 +65,51 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $mingwUrl = "https://sourceforge.net/projects/mingw-w64/files/latest/download"
-          $mingwInstallerPath = "$env:TEMP\mingw-w64-installer.exe"
-          Write-Host "Downloading MinGW-w64 installer from $mingwUrl ..."
-          curl -L $mingwUrl -o $mingwInstallerPath -vvv
-          $fileInfo = Get-Item $mingwInstallerPath
-          $fileSize = $fileInfo.Length
-          Write-Host "File size: $fileSize bytes"
-          Write-Host "Running MinGW-w64 installer ..."
-          Start-Process -FilePath $mingwInstallerPath -ArgumentList "/SILENT" -Wait
-          $mingwPath = "C:\mingw64"
-          if (Test-Path $mingwPath) {
-            Write-Host "MinGW-w64 successfully installed at $mingwPath."
-          } else {
-            Write-Host "MinGW-w64 installation failed. Please check the installation logs."
+          $mingwSourcePath = "$env:TEMP\mingw-w64-v11.0.0.tar.bz2"
+          $mingwSourceDir = "$env:TEMP\mingw-w64-v11.0.0"
+          
+          Write-Host "Downloading MinGW-w64 source code from $mingwUrl ..."
+          Invoke-WebRequest -Uri $mingwUrl -OutFile $mingwSourcePath
+          
+          Write-Host "Extracting MinGW-w64 source code ..."
+          tar -xjf $mingwSourcePath -C $env:TEMP
+          
+          $msys2Path = "C:\msys64"
+          
+          if (-Not (Test-Path $msys2Path)) {
+            Write-Host "MSYS2 is not installed. Please install MSYS2 from https://www.msys2.org/ before proceeding."
             exit 1
           }
+        
+          $mingwBinPath = "C:\msys64\mingw64\bin"
           $currentPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-          if ($currentPath -contains "$mingwPath\bin") {
-            Write-Host "MinGW-w64 path already added to system PATH."
-          } else {
-            $newPath = "$currentPath;$mingwPath\bin"
+          if (-Not ($currentPath -contains $mingwBinPath)) {
+            $newPath = "$currentPath;$mingwBinPath"
             [System.Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
-            Write-Host "MinGW-w64 path added to system PATH."
+            Write-Host "Added MinGW-w64 bin directory to system PATH."
+          } else {
+            Write-Host "MinGW-w64 bin directory is already in system PATH."
           }
-          Write-Host "Checking GCC version..."
-          $gccVersion = gcc --version
+        
+          Set-Location -Path $mingwSourceDir
+          
+          Write-Host "Configuring MinGW-w64 build ..."
+          ./configure --prefix=/mingw64 --enable-shared --enable-static
+          
+          Write-Host "Compiling MinGW-w64 ..."
+          make
+          
+          Write-Host "Installing MinGW-w64 ..."
+          make install
+          
+          Write-Host "Verifying MinGW-w64 installation ..."
+          $gccVersion = & "C:\msys64\mingw64\bin\gcc.exe" --version
           if ($gccVersion) {
             Write-Host "GCC is installed and available:"
             Write-Host $gccVersion
           } else {
             Write-Host "GCC is not available. Please check your installation."
           }
-          Remove-Item $mingwInstallerPath
-          Write-Host "Cleaned up installer file."
 
       - name: Build
         if: matrix.os != 'windows-latest'
