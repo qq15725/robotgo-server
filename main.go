@@ -1,30 +1,60 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-vgo/robotgo"
+	"github.com/go-vgo/robotgo/clipboard"
+	"github.com/robotn/gohook"
+	"runtime"
+	"time"
 )
 
 func main() {
-  robotgo.MouseSleep = 100
+	robotgo.KeySleep = 100
+	robotgo.MouseSleep = 100
+	RegisterSelectTextHook()
+}
 
-  robotgo.ScrollDir(10, "up")
-  robotgo.ScrollDir(20, "right")
+func HandleSelectText(x int16, y int16) {
+	oldVal, _ := clipboard.ReadAll()
+	if runtime.GOOS == "darwin" {
+		robotgo.KeyTap(robotgo.KeyC, robotgo.Cmd)
+	} else {
+		robotgo.KeyTap(robotgo.KeyC, robotgo.Ctrl)
+	}
+	val, _ := clipboard.ReadAll()
+	if len(val) != 0 {
+		fmt.Println(x, y)
+		fmt.Println(val)
+	}
+	clipboard.WriteAll(oldVal)
+}
 
-  robotgo.Scroll(0, -10)
-  robotgo.Scroll(100, 0)
+func RegisterSelectTextHook() {
+	isHold := false
+	starTime := time.Now()
 
-  robotgo.MilliSleep(100)
-  robotgo.ScrollSmooth(-10, 6)
-  // robotgo.ScrollRelative(10, -100)
+	hook.Register(hook.MouseHold, []string{}, func(e hook.Event) {
+		if e.Button == hook.MouseMap["left"] {
+			starTime = time.Now()
+			isHold = true
+		}
+	})
 
-  robotgo.Move(10, 20)
-  robotgo.MoveRelative(0, -10)
-  robotgo.DragSmooth(10, 10)
+	hook.Register(hook.MouseDown, []string{}, func(e hook.Event) {
+		if isHold {
+			isHold = false
+			diff := time.Now().Sub(starTime)
+			if diff > 200*time.Millisecond {
+				HandleSelectText(e.X, e.Y)
+			}
+		}
+	})
 
-  robotgo.Click("wheelRight")
-  robotgo.Click("left", true)
-  robotgo.MoveSmooth(100, 200, 1.0, 10.0)
+	hook.Register(hook.MouseUp, []string{}, func(e hook.Event) {
+		isHold = false
+	})
 
-  robotgo.Toggle("left")
-  robotgo.Toggle("left", "up")
+	s := hook.Start()
+	<-hook.Process(s)
 }

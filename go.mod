@@ -2,7 +2,10 @@ module robotgo-server
 
 go 1.23.3
 
-require github.com/go-vgo/robotgo v0.110.5
+require (
+	github.com/go-vgo/robotgo v0.110.5
+	github.com/robotn/gohook v0.42.0
+)
 
 require (
 	github.com/dblohm7/wingoes v0.0.0-20240820181039-f2b84150679e // indirect
