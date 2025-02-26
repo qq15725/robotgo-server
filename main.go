@@ -1,15 +1,18 @@
 package main
 
 import (
-	"context"
-	"github.com/go-vgo/robotgo"
+	"flag"
+	"fmt"
 )
 
 func main() {
-	robotgo.KeySleep = 100
-	robotgo.MouseSleep = 100
+	host := flag.String("h", "", "Host")
+	port := flag.Int("p", 0, "Port")
+	flag.Parse()
+	address := fmt.Sprintf("%s:%d", *host, *port)
 
-	go HookSelectText()
-
-	NewRobotgoServer().Serve(context.Background())
+	server := &RPCServer{}
+	listener := HookListener{server: server}
+	go listener.Listen()
+	server.Serve(address)
 }

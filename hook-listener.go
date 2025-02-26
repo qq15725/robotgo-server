@@ -1,30 +1,39 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-vgo/robotgo"
 	"github.com/go-vgo/robotgo/clipboard"
 	hook "github.com/robotn/gohook"
+	"log"
 	"runtime"
 	"time"
 )
 
-func HandleSelectText(x int16, y int16) {
+type HookListener struct {
+	server *RPCServer
+}
+
+func (s *HookListener) handleSelectText(x int16, y int16) {
 	oldVal, _ := clipboard.ReadAll()
 	if runtime.GOOS == "darwin" {
 		robotgo.KeyTap(robotgo.KeyC, robotgo.Cmd)
 	} else {
 		robotgo.KeyTap(robotgo.KeyC, robotgo.Ctrl)
 	}
-	val, _ := clipboard.ReadAll()
-	if len(val) != 0 {
-		fmt.Println(x, y)
-		fmt.Println(val)
+	text, _ := clipboard.ReadAll()
+	if len(text) != 0 {
+		s.server.Notify("onSelectText", map[string]interface{}{
+			"x":    x,
+			"y":    y,
+			"text": text,
+		})
 	}
-	clipboard.WriteAll(oldVal)
+	if err := clipboard.WriteAll(oldVal); err != nil {
+		log.Println("Failed to clipboard.WriteAll", err)
+	}
 }
 
-func HookSelectText() {
+func (s *HookListener) Listen() {
 	isHold := false
 	starTime := time.Now()
 
@@ -40,7 +49,7 @@ func HookSelectText() {
 			isHold = false
 			diff := time.Now().Sub(starTime)
 			if diff > 200*time.Millisecond {
-				HandleSelectText(e.X, e.Y)
+				s.handleSelectText(e.X, e.Y)
 			}
 		}
 	})
@@ -49,6 +58,7 @@ func HookSelectText() {
 		isHold = false
 	})
 
-	s := hook.Start()
-	<-hook.Process(s)
+	hookEvent := hook.Start()
+
+	<-hook.Process(hookEvent)
 }

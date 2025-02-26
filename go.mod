@@ -4,6 +4,7 @@ go 1.23.3
 
 require (
 	github.com/go-vgo/robotgo v0.110.5
+	github.com/gorilla/websocket v1.4.1
 	github.com/robotn/gohook v0.42.0
 	github.com/sourcegraph/jsonrpc2 v0.2.0
 )
