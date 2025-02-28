@@ -2,6 +2,11 @@
 
 [![GitHub release](https://img.shields.io/github/release/qq15725/robotgo-server.svg)](https://github.com/qq15725/robotgo-server/releases/latest)
 
+## Features
+
+- Remotely invoke the Server machine Robotgo method via WebSocket
+- Monitor mouse selection text notification WebSocket
+
 ## 🦄 Usage
 
 Download the binary file for the corresponding operating system from the [release](https://github.com/qq15725/robotgo-server/releases) page
@@ -22,7 +27,11 @@ WebSocket client test
 # pnpm add -g wscat
 wscat -c ws://localhost:8080
 
+# Call robotgo.Move(100, 100)
 > {"jsonrpc":"2.0","method":"Move","params":[100,100]}
+
+# Mouse select text notify
+< {"jsonrpc":"2.0","method":"onSelectText","params":{"text":"# onSelectText","x":368,"y":730}}
 ```
 
 ## All callable methods
