@@ -27,6 +27,6 @@ wscat -c ws://localhost:8080
 
 ## All callable methods
 
-See the [rpc-map.go](./rpc-map.go) with [go-vgo/robotgo](https://github.com/go-vgo/robotgo)
+See the [rpc-map.go](./rpc-map.go) and [go-vgo/robotgo](https://github.com/go-vgo/robotgo)
 
 
