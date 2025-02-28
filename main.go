@@ -12,7 +12,7 @@ func main() {
 	address := fmt.Sprintf("%s:%d", *host, *port)
 
 	server := &RPCServer{}
-	listener := HookListener{server: server}
+	listener := EventListener{server: server}
 	go listener.Listen()
 	server.Serve(address)
 }

@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-type HookListener struct {
+type EventListener struct {
 	server *RPCServer
 }
 
-func (s *HookListener) handleSelectText(x int16, y int16) {
+func (s *EventListener) onSelectText(x int16, y int16) {
 	oldVal, _ := clipboard.ReadAll()
 	if runtime.GOOS == "darwin" {
 		robotgo.KeyTap(robotgo.KeyC, robotgo.Cmd)
@@ -33,7 +33,7 @@ func (s *HookListener) handleSelectText(x int16, y int16) {
 	}
 }
 
-func (s *HookListener) Listen() {
+func (s *EventListener) Listen() {
 	isHold := false
 	starTime := time.Now()
 
@@ -49,7 +49,7 @@ func (s *HookListener) Listen() {
 			isHold = false
 			diff := time.Now().Sub(starTime)
 			if diff > 200*time.Millisecond {
-				s.handleSelectText(e.X, e.Y)
+				s.onSelectText(e.X, e.Y)
 			}
 		}
 	})
