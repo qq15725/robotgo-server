@@ -16,4 +16,17 @@ robotgo_server -p 8080;
 # double click robotgo_server_xx_xxx_xx_xxx.exe
 ```
 
+WebSocket client test
+
+```shell
+# pnpm add -g wscat
+wscat -c ws://localhost:8080
+
+> {"jsonrpc":"2.0","method":"Move","params":[100,100]}
+```
+
+## All callable methods
+
+See the [rpc-map.go](./rpc-map.go) with [go-vgo/robotgo](https://github.com/go-vgo/robotgo)
+
 
