@@ -66,13 +66,15 @@ func (s *EventListener) Listen() {
 		startEvent = hook.Event{}
 	})
 
-	hook.Register(hook.KeyDown, []string{robotgo.KeyC, robotgo.Cmd}, func(e hook.Event) {
-		s.onCopyText()
-	})
-
-	hook.Register(hook.KeyDown, []string{robotgo.KeyC, robotgo.Ctrl}, func(e hook.Event) {
-		s.onCopyText()
-	})
+	if runtime.GOOS == "darwin" {
+		hook.Register(hook.KeyDown, []string{robotgo.KeyC, robotgo.Cmd}, func(e hook.Event) {
+			s.onCopyText()
+		})
+	} else {
+		hook.Register(hook.KeyDown, []string{robotgo.KeyC, robotgo.Ctrl}, func(e hook.Event) {
+			s.onCopyText()
+		})
+	}
 
 	hookEvent := hook.Start()
 
