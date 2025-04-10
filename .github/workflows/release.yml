@@ -100,7 +100,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          makeLatest: false
           tag: ${{ steps.get-tag.outputs.tag }}
           artifacts: 'dist/*'
           token: ${{ secrets.GITHUB_TOKEN }}

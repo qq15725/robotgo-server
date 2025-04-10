@@ -13,8 +13,9 @@ type EventListener struct {
 	server *RPCServer
 }
 
-func (s *EventListener) onSelectText(x int16, y int16) {
+func (s *EventListener) onSelectText(start hook.Event, end hook.Event) {
 	oldVal, _ := clipboard.ReadAll()
+	clipboard.WriteAll("")
 	if runtime.GOOS == "darwin" {
 		robotgo.KeyTap(robotgo.KeyC, robotgo.Cmd)
 	} else {
@@ -23,9 +24,9 @@ func (s *EventListener) onSelectText(x int16, y int16) {
 	text, _ := clipboard.ReadAll()
 	if len(text) != 0 {
 		s.server.Notify("onSelectText", map[string]interface{}{
-			"x":    x,
-			"y":    y,
-			"text": text,
+			"start": start,
+			"end":   end,
+			"text":  text,
 		})
 	}
 	if err := clipboard.WriteAll(oldVal); err != nil {
@@ -42,28 +43,33 @@ func (s *EventListener) onCopyText() {
 }
 
 func (s *EventListener) Listen() {
-	startTime := time.Now()
 	var startEvent hook.Event
 
 	hook.Register(hook.MouseHold, []string{}, func(e hook.Event) {
 		if e.Button == hook.MouseMap["left"] {
-			startTime = time.Now()
+			if startEvent == (hook.Event{}) {
+				s.server.Notify("onMouseDown", e)
+			}
 			startEvent = e
 		}
 	})
 
 	hook.Register(hook.MouseDown, []string{}, func(e hook.Event) {
 		if startEvent != (hook.Event{}) {
-			diff := time.Now().Sub(startTime)
+			diff := e.When.Sub(startEvent.When)
 			if diff > 200*time.Millisecond {
-				s.onSelectText(startEvent.X, startEvent.Y)
+				s.server.Notify("onMouseUp", e)
+				s.onSelectText(startEvent, e)
 			}
 			startEvent = hook.Event{}
+		} else {
+			s.server.Notify("onMouseDown", e)
 		}
 	})
 
 	hook.Register(hook.MouseUp, []string{}, func(e hook.Event) {
 		startEvent = hook.Event{}
+		s.server.Notify("onMouseUp", e)
 	})
 
 	if runtime.GOOS == "darwin" {
