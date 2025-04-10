@@ -33,29 +33,45 @@ func (s *EventListener) onSelectText(x int16, y int16) {
 	}
 }
 
+func (s *EventListener) onCopyText() {
+	if val, err := clipboard.ReadAll(); err == nil {
+		s.server.Notify("onCopyText", map[string]interface{}{
+			"text": val,
+		})
+	}
+}
+
 func (s *EventListener) Listen() {
-	isHold := false
-	starTime := time.Now()
+	startTime := time.Now()
+	var startEvent hook.Event
 
 	hook.Register(hook.MouseHold, []string{}, func(e hook.Event) {
 		if e.Button == hook.MouseMap["left"] {
-			starTime = time.Now()
-			isHold = true
+			startTime = time.Now()
+			startEvent = e
 		}
 	})
 
 	hook.Register(hook.MouseDown, []string{}, func(e hook.Event) {
-		if isHold {
-			isHold = false
-			diff := time.Now().Sub(starTime)
+		if startEvent != (hook.Event{}) {
+			diff := time.Now().Sub(startTime)
 			if diff > 200*time.Millisecond {
-				s.onSelectText(e.X, e.Y)
+				s.onSelectText(startEvent.X, startEvent.Y)
 			}
+			startEvent = hook.Event{}
 		}
 	})
 
 	hook.Register(hook.MouseUp, []string{}, func(e hook.Event) {
-		isHold = false
+		startEvent = hook.Event{}
+	})
+
+	hook.Register(hook.KeyDown, []string{robotgo.KeyC, robotgo.Cmd}, func(e hook.Event) {
+		s.onCopyText()
+	})
+
+	hook.Register(hook.KeyDown, []string{robotgo.KeyC, robotgo.Ctrl}, func(e hook.Event) {
+		s.onCopyText()
 	})
 
 	hookEvent := hook.Start()
