@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, ubuntu-22.04-arm, macos-latest ]
+        os: [ ubuntu-latest, ubuntu-22.04-arm, macos-13, macos-latest ]
         go-version: [ '1.23.3' ]
 
     steps:
@@ -61,7 +61,7 @@ jobs:
             if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               sudo apt-get install mingw-w64
             fi
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-13" || "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install libpng libjpeg libx11
           fi
 
@@ -76,9 +76,13 @@ jobs:
             platforms=(
               "linux/arm64"
             )
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
             platforms=(
               "darwin/amd64"
+            )
+          fi
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            platforms=(
               "darwin/arm64"
             )
           fi
