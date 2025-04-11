@@ -80,7 +80,6 @@ jobs:
             platforms=(
               "darwin/amd64"
             )
-          fi
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             platforms=(
               "darwin/arm64"
