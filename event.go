@@ -17,9 +17,9 @@ func (s *EventListener) onSelectText(start hook.Event, end hook.Event) {
 	oldVal, _ := clipboard.ReadAll()
 	clipboard.WriteAll("")
 	if runtime.GOOS == "darwin" {
-		robotgo.KeyTap(robotgo.KeyC, robotgo.Cmd)
+		robotgo.KeyTap("c", "lcmd")
 	} else {
-		robotgo.KeyTap(robotgo.KeyC, robotgo.Ctrl)
+		robotgo.KeyTap("c", "lctrl")
 	}
 	text, _ := clipboard.ReadAll()
 	if len(text) != 0 {
