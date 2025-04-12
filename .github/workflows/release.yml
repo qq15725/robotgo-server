@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, ubuntu-20.04, macos-latest ]
+        os: [ ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-latest ]
         go-version: [ '1.23.3' ]
 
     steps:
@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         if: matrix.os != 'windows-latest'
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" || "${{ matrix.os }}" == "ubuntu-20.04" ]]; then
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" || "${{ matrix.os }}" == "ubuntu-24.04-arm" ]]; then
             sudo apt-get update
             # gcc
             sudo apt-get install -y gcc libc6-dev
@@ -61,7 +61,7 @@ jobs:
             if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               sudo apt-get install mingw-w64
             fi
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-13" || "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install libpng libjpeg libx11
           fi
 
@@ -72,13 +72,16 @@ jobs:
               "linux/amd64"
               "windows/amd64"
             )
-          elif [[ "${{ matrix.os }}" == "ubuntu-20.04" ]]; then
+          elif [[ "${{ matrix.os }}" == "ubuntu-24.04-arm" ]]; then
             platforms=(
               "linux/arm64"
             )
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
             platforms=(
               "darwin/amd64"
+            )
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            platforms=(
               "darwin/arm64"
             )
           fi
